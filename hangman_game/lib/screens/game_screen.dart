@@ -7,6 +7,8 @@ class GameScreen extends StatefulWidget {
 
   const GameScreen({super.key, required this.category, required this.words});
 
+  Object? get targetWord => null;
+
   @override
   GameScreenState createState() => GameScreenState();
 }
