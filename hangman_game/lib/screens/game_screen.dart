@@ -5,21 +5,19 @@ class GameScreen extends StatefulWidget {
   final String category;
   final List<String> words;
 
-  const GameScreen({Key? key, required this.category, required this.words})
-      : super(key: key);
+  const GameScreen({super.key, required this.category, required this.words});
 
   @override
-  _GameScreenState createState() => _GameScreenState();
+  GameScreenState createState() => GameScreenState();
 }
 
-class _GameScreenState extends State<GameScreen>
+class GameScreenState extends State<GameScreen>
     with SingleTickerProviderStateMixin {
   late String targetWord;
   late String hint;
   Set<String> guessedLetters = {};
   int lives = 6;
 
-  // Animation variables
   late AnimationController _controller;
   late Animation<double> _bounceAnimation;
 
@@ -30,11 +28,11 @@ class _GameScreenState extends State<GameScreen>
     targetWord = widget.words[random.nextInt(widget.words.length)];
     hint = "Category: ${widget.category}. Word length: ${targetWord.length}";
 
-    // Initialize animation
     _controller = AnimationController(
       duration: const Duration(milliseconds: 500),
       vsync: this,
     );
+
     _bounceAnimation = Tween<double>(begin: 1.0, end: 1.2).animate(
       CurvedAnimation(parent: _controller, curve: Curves.bounceOut),
     );
@@ -46,14 +44,14 @@ class _GameScreenState extends State<GameScreen>
     super.dispose();
   }
 
-  void handleGuess(String letter) async {
+  void handleGuess(String letter) {
+    if (guessedLetters.contains(letter) || lives == 0) return;
+
     setState(() {
+      guessedLetters.add(letter);
       if (!targetWord.contains(letter)) {
         lives--;
       } else {
-        guessedLetters.add(letter);
-
-        // Trigger bounce animation for correct guesses
         _controller.forward(from: 0);
       }
     });
@@ -83,16 +81,22 @@ class _GameScreenState extends State<GameScreen>
           TextButton(
             onPressed: () {
               Navigator.pop(context);
-              setState(() {
-                guessedLetters = {};
-                lives = 6;
-              });
+              resetGame();
             },
             child: const Text("Play Again"),
           ),
         ],
       ),
     );
+  }
+
+  void resetGame() {
+    setState(() {
+      final random = Random();
+      targetWord = widget.words[random.nextInt(widget.words.length)];
+      guessedLetters.clear();
+      lives = 6;
+    });
   }
 
   Widget buildWordDisplay() {
@@ -106,10 +110,26 @@ class _GameScreenState extends State<GameScreen>
               scale: guessedLetters.contains(char) ? _bounceAnimation.value : 1,
               child: Container(
                 margin: const EdgeInsets.symmetric(horizontal: 4),
+                padding:
+                    const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(10),
+                  color: Colors.white.withOpacity(0.8),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black12,
+                      blurRadius: 4,
+                      offset: Offset(2, 2),
+                    ),
+                  ],
+                ),
                 child: Text(
                   guessedLetters.contains(char) ? char : "_",
                   style: const TextStyle(
-                      fontSize: 32, fontWeight: FontWeight.bold),
+                    fontSize: 32,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black87,
+                  ),
                 ),
               ),
             );
@@ -120,33 +140,58 @@ class _GameScreenState extends State<GameScreen>
   }
 
   Widget buildAlphabetButtons() {
-    const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-    return GridView.count(
-      crossAxisCount: 6,
-      shrinkWrap: true,
-      crossAxisSpacing: 4,
-      mainAxisSpacing: 4,
-      children: alphabet.split('').map((letter) {
-        return ElevatedButton(
-          style: ElevatedButton.styleFrom(
-            backgroundColor:
-                guessedLetters.contains(letter) ? Colors.grey : Colors.blue,
-            shape: const CircleBorder(),
-            padding: const EdgeInsets.all(12),
-          ),
-          onPressed: guessedLetters.contains(letter) || lives == 0
-              ? null
-              : () => handleGuess(letter),
-          child: Text(
-            letter,
-            style: const TextStyle(
-              fontSize: 14, // Smaller font size
-              fontWeight: FontWeight.bold,
-              color: Colors.white, // White text
+    return GridView.builder(
+      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 6,
+        mainAxisSpacing: 10,
+        crossAxisSpacing: 10,
+      ),
+      padding: const EdgeInsets.all(10),
+      itemCount: 26,
+      itemBuilder: (context, index) {
+        String letter = String.fromCharCode(65 + index);
+
+        return GestureDetector(
+          onTap: () =>
+              guessedLetters.contains(letter) ? null : handleGuess(letter),
+          child: Container(
+            alignment: Alignment.center,
+            decoration: BoxDecoration(
+              gradient: guessedLetters.contains(letter)
+                  ? LinearGradient(
+                      colors: [Colors.grey.shade400, Colors.grey.shade500],
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                    )
+                  : LinearGradient(
+                      colors: [Colors.teal.shade300, Colors.blue.shade400],
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                    ),
+              borderRadius: BorderRadius.circular(8),
+              boxShadow: guessedLetters.contains(letter)
+                  ? []
+                  : [
+                      BoxShadow(
+                        color: Colors.black26,
+                        blurRadius: 6,
+                        offset: Offset(2, 4),
+                      ),
+                    ],
+            ),
+            child: Text(
+              letter,
+              style: TextStyle(
+                fontSize: 18,
+                color: guessedLetters.contains(letter)
+                    ? Colors.white.withOpacity(0.6)
+                    : Colors.white,
+                fontWeight: FontWeight.bold,
+              ),
             ),
           ),
         );
-      }).toList(),
+      },
     );
   }
 
@@ -154,45 +199,51 @@ class _GameScreenState extends State<GameScreen>
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Category: ${widget.category}"),
+        title: Text(
+          "Category: ${widget.category}",
+          style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w600),
+        ),
+        backgroundColor: Colors.teal.shade700,
+        elevation: 10,
+        shadowColor: Colors.black45,
       ),
-      body: GestureDetector(
-        onHorizontalDragEnd: (details) {
-          // Swipe gestures
-          if (details.velocity.pixelsPerSecond.dx > 0) {
-            // Swipe right: Reset game
-            setState(() {
-              guessedLetters = {};
-              lives = 6;
-            });
-          } else if (details.velocity.pixelsPerSecond.dx < 0) {
-            // Swipe left: Return to home screen
-            Navigator.pop(context);
-          }
-        },
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                "Hint: $hint",
-                style:
-                    const TextStyle(fontSize: 18, fontStyle: FontStyle.italic),
-              ),
-              Text(
-                "Lives: $lives",
-                style:
-                    const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-              ),
-              FadeTransition(
-                opacity: _controller.drive(CurveTween(curve: Curves.easeIn)),
-                child: buildWordDisplay(),
-              ),
-              const SizedBox(height: 20),
-              Expanded(child: buildAlphabetButtons()),
-            ],
+      body: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: [Colors.teal.shade100, Colors.blue.shade200],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
           ),
+        ),
+        child: Column(
+          children: [
+            Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Text(
+                hint,
+                textAlign: TextAlign.center,
+                style: const TextStyle(
+                  fontSize: 18,
+                  fontStyle: FontStyle.italic,
+                  color: Colors.black87,
+                ),
+              ),
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: List.generate(
+                lives,
+                (index) => Icon(Icons.favorite, color: Colors.red, size: 30),
+              ),
+            ),
+            const SizedBox(height: 20),
+            buildWordDisplay(),
+            const Spacer(),
+            Expanded(
+              flex: 3,
+              child: buildAlphabetButtons(),
+            ),
+          ],
         ),
       ),
     );

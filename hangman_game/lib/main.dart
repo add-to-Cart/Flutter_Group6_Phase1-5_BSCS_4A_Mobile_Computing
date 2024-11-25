@@ -6,13 +6,13 @@ void main() {
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({Key? key}) : super(key: key);
+  const MyApp({super.key});
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      title: 'Flutter_GroupName_Phase1-5_BSCS_4A_Mobile_Computing',
+      title: 'Hangman Game',
       theme: ThemeData(primarySwatch: Colors.blue),
       home: const HomeScreen(),
     );
