@@ -117,7 +117,7 @@ class GameScreenState extends State<GameScreen>
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(10),
                   color: Colors.white.withOpacity(0.8),
-                  boxShadow: [
+                  boxShadow: const [
                     BoxShadow(
                       color: Colors.black12,
                       blurRadius: 4,
@@ -174,7 +174,7 @@ class GameScreenState extends State<GameScreen>
               boxShadow: guessedLetters.contains(letter)
                   ? []
                   : [
-                      BoxShadow(
+                      const BoxShadow(
                         color: Colors.black26,
                         blurRadius: 6,
                         offset: Offset(2, 4),
@@ -235,7 +235,8 @@ class GameScreenState extends State<GameScreen>
               mainAxisAlignment: MainAxisAlignment.center,
               children: List.generate(
                 lives,
-                (index) => Icon(Icons.favorite, color: Colors.red, size: 30),
+                (index) =>
+                    const Icon(Icons.favorite, color: Colors.red, size: 30),
               ),
             ),
             const SizedBox(height: 20),

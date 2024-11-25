@@ -21,7 +21,7 @@ void main() {
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({Key? key}) : super(key: key);
+  const MyApp({super.key}); // Convert key to superparameter
 
   @override
   Widget build(BuildContext context) {
@@ -35,13 +35,13 @@ class MyApp extends StatelessWidget {
 }
 
 class CounterWidget extends StatefulWidget {
-  const CounterWidget({Key? key}) : super(key: key);
+  const CounterWidget({super.key}); // Convert key to superparameter
 
   @override
-  _CounterWidgetState createState() => _CounterWidgetState();
+  CounterWidgetState createState() => CounterWidgetState();
 }
 
-class _CounterWidgetState extends State<CounterWidget> {
+class CounterWidgetState extends State<CounterWidget> {
   int _counter = 0;
 
   @override
@@ -50,7 +50,12 @@ class _CounterWidgetState extends State<CounterWidget> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Text('$_counter', style: Theme.of(context).textTheme.headlineMedium),
+          Text(
+            '$_counter',
+            style: Theme.of(context)
+                .textTheme
+                .headlineMedium, // Use headlineMedium
+          ),
           IconButton(
             icon: const Icon(Icons.add),
             onPressed: () {
