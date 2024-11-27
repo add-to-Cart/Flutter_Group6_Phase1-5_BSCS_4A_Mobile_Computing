@@ -1,11 +1,17 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class GameScreen extends StatefulWidget {
   final String category;
   final List<String> words;
+  final String playerName;
 
-  const GameScreen({super.key, required this.category, required this.words});
+  const GameScreen(
+      {super.key,
+      required this.category,
+      required this.words,
+      required this.playerName});
 
   Object? get targetWord => null;
 
@@ -19,9 +25,11 @@ class GameScreenState extends State<GameScreen>
   late String hint;
   Set<String> guessedLetters = {};
   int lives = 6;
+  int score = 0;
 
   late AnimationController _controller;
   late Animation<double> _bounceAnimation;
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
   @override
   void initState() {
@@ -55,16 +63,29 @@ class GameScreenState extends State<GameScreen>
         lives--;
       } else {
         _controller.forward(from: 0);
+        score += 10; // Increment score for correct guesses
       }
     });
 
     if (lives == 0) {
+      saveScore("Lost");
       showEndDialog("You Lost! The word was \"$targetWord\".");
     } else if (targetWord
         .split('')
         .every((char) => guessedLetters.contains(char))) {
+      saveScore("Won");
       showEndDialog("Congratulations! You guessed the word!");
     }
+  }
+
+  Future<void> saveScore(String result) async {
+    await _firestore.collection('leaderboard').add({
+      'playerName': widget.playerName,
+      'category': widget.category,
+      'score': score,
+      'result': result,
+      'date': DateTime.now(),
+    });
   }
 
   void showEndDialog(String message) {

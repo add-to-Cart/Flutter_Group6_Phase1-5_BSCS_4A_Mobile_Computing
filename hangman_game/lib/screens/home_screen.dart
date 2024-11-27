@@ -12,6 +12,8 @@ class HomeScreen extends StatelessWidget {
       "Countries": ["INDIA", "CANADA", "BRAZIL", "JAPAN", "FRANCE"]
     };
 
+    final TextEditingController playerNameController = TextEditingController();
+
     return Scaffold(
       appBar: AppBar(
         title: const Text("Hangman Game"),
@@ -33,6 +35,29 @@ class HomeScreen extends StatelessWidget {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
+              const Text(
+                "Enter Your Name",
+                style: TextStyle(
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
+                  letterSpacing: 1.5,
+                ),
+              ),
+              const SizedBox(height: 10),
+              TextField(
+                controller: playerNameController,
+                decoration: InputDecoration(
+                  hintText: "Player Name",
+                  filled: true,
+                  fillColor: Colors.white,
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide.none,
+                  ),
+                ),
+              ),
+              const SizedBox(height: 20),
               const Text(
                 "Choose a Category",
                 style: TextStyle(
@@ -63,11 +88,19 @@ class HomeScreen extends StatelessWidget {
                           ),
                         ),
                         onPressed: () {
-                          // Add scale effect using a simple animation controller or `InkWell`
+                          if (playerNameController.text.isEmpty) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text("Please enter your name!"),
+                              ),
+                            );
+                            return;
+                          }
                           Navigator.push(
                             context,
                             MaterialPageRoute(
                               builder: (context) => GameScreen(
+                                playerName: playerNameController.text,
                                 category: category,
                                 words: categories[category]!,
                               ),
@@ -88,6 +121,26 @@ class HomeScreen extends StatelessWidget {
                   }).toList(),
                 ),
               ),
+              const SizedBox(height: 20),
+              ElevatedButton(
+                onPressed: () {
+                  Navigator.pushNamed(context, '/leaderboard');
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.amber,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
+                child: const Text(
+                  "View Leaderboard",
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black,
+                  ),
+                ),
+              )
             ],
           ),
         ),

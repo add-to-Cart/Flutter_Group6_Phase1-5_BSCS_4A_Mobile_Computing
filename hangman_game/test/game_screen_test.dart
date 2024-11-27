@@ -9,7 +9,11 @@ void main() {
 
     // Build the GameScreen widget
     await tester.pumpWidget(MaterialApp(
-      home: GameScreen(category: "Animals", words: words),
+      home: GameScreen(
+        category: "Animals",
+        words: words,
+        playerName: '',
+      ),
     ));
 
     // Wait for the widget to finish building

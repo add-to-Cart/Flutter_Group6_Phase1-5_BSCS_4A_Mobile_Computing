@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "201509931140",
+    "project_id": "grp6-hangman-flutter",
+    "storage_bucket": "grp6-hangman-flutter.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:201509931140:android:e37a71d3c6d03f6aaedad1",
+        "android_client_info": {
+          "package_name": "com.example.hangman_game"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAUkNskusn-KIc35yLJRdidOj6qLTEs1ww"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
